@@ -502,7 +502,7 @@ def pcap_process(dataset_folder, window_size, vulnerable_ports_list, http_ports_
                     current_time = time.strftime("%Y%m%d-%H%M%S")
                     output_file_name = f"{file_name}_{file_size}_{current_time}_processed.csv"
                     output_file_path = os.path.join(output_directory, output_file_name)
-                
+                file_size = os.path.getsize(file_path)
                 # If file size is greater than 2 GB, split into smaller files using nfstream's `rotate_files`
                 file_size_gb = file_size / (1024 ** 3)  # Convert bytes to GB
                 if file_size_gb > 2:
