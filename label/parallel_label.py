@@ -18,7 +18,7 @@ def process_csv_file(args):
         df = pd.read_csv(file_path, names=usecols,low_memory=False)
         df.columns = df.columns.str.replace(' ', '')
         df.columns = df.columns.str.lower()
-
+        df = df.dropna(subset=[timestamp_column])
         if timestamp_column in df.columns:
             # Min and Max timestamp
             min_timestamp = df[timestamp_column].min()
@@ -92,6 +92,39 @@ def get_relevant_csvs(time_ranges_df, new_min_timestamp, new_max_timestamp):
     ]
     return relevant_csvs
 
+import pandas as pd
+
+def remove_strings_from_columns(df, col_names):
+    """
+    Removes rows with string (non-numeric) values in the specified columns.
+    
+    Parameters:
+    df (pd.DataFrame): The DataFrame to process.
+    col_names (list): List of column names to check for non-numeric values.
+    
+    Returns:
+    pd.DataFrame: DataFrame with rows containing non-numeric values in the specified columns removed.
+    """
+    
+    for col in col_names:
+        # Convert the column to numeric, setting non-numeric values to NaN
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+        
+        # Display rows with NaN values (which were originally strings or non-numeric)
+        invalid_rows = df[df[col].isna()]
+        #if not invalid_rows.empty:
+        #    print(f"Rows with invalid (non-numeric) values in column '{col}':")
+        #    print(invalid_rows)
+        
+        # Drop rows where the column has NaN values
+        df = df.dropna(subset=[col])
+        
+        # Optionally, convert back to integer or float if necessary
+        df[col] = df[col].astype('int64')  # You can change to 'float64' if needed
+    
+    return df
+
+
 # Function to read relevant CSVs into a single DataFrame
 def read_relevant_csvs(relevant_csvs_df):
     df_list = []
@@ -121,11 +154,15 @@ def prepare_labeled_csv_flowid(df2):
     #df2=pd.read_csv(csv_address,low_memory=False)
     df2.columns=df2.columns.str.replace(' ','')
     df2.columns=df2.columns.str.lower()
+    
     # Automatically extract column names for source IP, destination IP, source port, and destination port
     src_ip = df2.columns[df2.columns.str.contains(r'(src|source).*ip', case=False, regex=True)].tolist()[0]
     dst_ip = df2.columns[df2.columns.str.contains(r'(dst|destination).*ip', case=False, regex=True)].tolist()[0]
     src_port = df2.columns[df2.columns.str.contains(r'(src|source).*port', case=False, regex=True)].tolist()[0]
     dst_port = df2.columns[df2.columns.str.contains(r'(dst|destination).*port', case=False, regex=True)].tolist()[0]
+    df2 = df2.dropna(subset=[dst_port,src_port])
+    df2[dst_port]=df2[dst_port].astype(int)
+    df2[src_port]=df2[src_port].astype(int)
     df2['flowid']=df2[src_ip].astype(str)+'-'+df2[dst_ip].astype(str)+'-'+df2[src_port].astype(str)+'-'+df2[dst_port].astype(str)
     return df2
 
@@ -136,30 +173,47 @@ def filter_matching_flowid(df1, df2, column_name='flowid'):
     common_flowids = pd.merge(df1[[column_name]], df2[[column_name]], on=column_name, how='inner')[column_name]
     
     df1_filtered = df1[df1[column_name].isin(common_flowids)].copy()
+    #
+    #df1[df1[column_name].isin(df2[column_name])]
     df2_filtered = df2[df2[column_name].isin(common_flowids)].copy()
-    
+    ##
+    #df2[df2[column_name].isin(df1[column_name])]
+    #print(df2_filtered[df2_filtered['attack_cat']=='Worms'])
     return df1_filtered, df2_filtered
 
 # Function to add labels to df1 based on time range in df2
-def label_based_on_time(df1_filtered, df2_filtered,label_col='label'):
+def label_based_on_time(df1_filtered, df2_filtered, label_col='label'):
     # Initialize a new 'label' column in df1_filtered with default values (e.g., 'No Match')
     df1_filtered['label'] = 'No Match'
 
-    # Iterate over each row in df2_filtered and apply the time range filtering
+    # Define the buffer for relaxation in milliseconds
+    buffer_ms = 500*2
+
+    # Iterate over each row in df2_filtered and apply the relaxed time range filtering
     for _, row in df2_filtered.iterrows():
-        # Find rows in df1_filtered where 'first_seen_ms' is in the time range of df2's start and end timestamps
+        # Find rows in df1_filtered where 'first_seen_ms' is within the relaxed time range (+/-500 ms)
+        #condition = (
+        #    (df1_filtered['bidirectional_first_seen_ms'] >= (row['start_timestamp_ms'] - buffer_ms)) & 
+        #    (df1_filtered['bidirectional_first_seen_ms'] <= (row['end_timestamp_ms'] + buffer_ms))
+        #)
         condition = (
-            (df1_filtered['bidirectional_first_seen_ms'] >= row['start_timestamp_ms']) & 
-            (df1_filtered['bidirectional_first_seen_ms'] <= row['end_timestamp_ms'])
+                (df1_filtered['flowid'] == (row['flowid']) ) #| 
+            #((df1_filtered['bidirectional_first_seen_ms'] <= (row['end_timestamp_ms'] + buffer_ms)) & 
+            #(df1_filtered['bidirectional_first_seen_ms'] >= (row['start_timestamp_ms'] - buffer_ms)))
         )
         
         # Assign the 'label' from df2 to the matching rows in df1
         df1_filtered.loc[condition, 'label'] = row[label_col]
+
+    
+    
     
     return df1_filtered
 
 
+
 def datetime_to_timestamp(df, timestamp_column, timezone, flow_duration_column,unit='ms'):
+    
     if timezone!='None':
         # Convert the column to datetime and localize to the provided timezone
         df['localized_timestamp'] = pd.to_datetime(df[timestamp_column])
@@ -195,12 +249,17 @@ def process_csv(csv_file, input_folder, output_path, time_ranges_df, timezone,
 
         # Step 1: Prepare unlabeled CSV flowid using the provided function
         df1 = prepare_unlabeled_csv_flowid(csv_file_path)
+        columns_to_check = ['bidirectional_first_seen_ms']
+
+        # Call the function to remove strings and invalid entries from specified columns
+        df1 = remove_strings_from_columns(df1, columns_to_check)
         relevant_csvs_df = get_relevant_csvs(time_ranges_df, min(df1['bidirectional_first_seen_ms']), max(df1['bidirectional_first_seen_ms']))
 
         # Step 3: Read relevant CSV files into a single DataFrame
         df2 = read_relevant_csvs(relevant_csvs_df)
         df2 = prepare_labeled_csv_flowid(df2)
-
+        #df2.dropna(inplace=True)
+        
         # Step 2: Filter based on flowid matching between df1 and df2
         df1_filtered, df2_filtered = filter_matching_flowid(df1, df2)
 
