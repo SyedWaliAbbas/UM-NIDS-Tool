@@ -58,7 +58,7 @@ This workflow ensures smooth processing and labeling of PCAP files into a unifie
 
 ## Example Usage
 
-This repository contains example Jupyter notebook (.ipynb) files demonstrating the processing of all four datasets included in the UM-NIDS dataset. Additionally, it includes the performance evaluation of a Random Forest-based machine learning classifier.
+This repository contains example Jupyter notebook [.ipynb](https://github.com/SyedWaliAbbas/Unified-Network-Intrusion-Dataset/tree/main/Dataset%20Examples) files demonstrating the processing of all four datasets included in the UM-NIDS dataset. Additionally, it includes the performance evaluation of a Random Forest-based machine learning classifier.
 
 You will also find examples of payload-based NIDS processing in the file [payload_based_Cross_validation.ipynb](https://github.com/SyedWaliAbbas/Unified-Network-Intrusion-Dataset/blob/main/Dataset%20Examples/Payload%20cross%20validation/payload_cross_validation_example.ipynb), where we cross-validate payload-specific attacks.
 
