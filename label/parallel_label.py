@@ -146,7 +146,15 @@ def read_relevant_csvs(relevant_csvs_df):
     return combined_df
 
 def prepare_unlabeled_csv_flowid(csv_address):
+    column_name = 'udps.payload_data'
+    length_limit = 97404490 
+    
     df1=pd.read_csv(csv_address,low_memory=False)
+    if column_name in df1.columns:
+        # Ensure the column is of type string before truncating
+        df1[column_name] = df1[column_name].astype(str)      
+        # Apply truncation to each value in the column
+        df1[column_name] = df1[column_name].apply(lambda x: x[:length_limit] if len(x) > length_limit else x)
     df1['flowid']=df1['src_ip'].astype(str)+'-'+df1['dst_ip'].astype(str)+'-'+df1['src_port'].astype(str)+'-'+df1['dst_port'].astype(str)
     return df1
 
@@ -249,7 +257,7 @@ def process_csv(csv_file, input_folder, output_path, time_ranges_df, timezone,
 
         # Step 1: Prepare unlabeled CSV flowid using the provided function
         df1 = prepare_unlabeled_csv_flowid(csv_file_path)
-        columns_to_check = ['bidirectional_first_seen_ms']
+        columns_to_check = ['bidirectional_first_seen_ms','src_port','dst_port']
 
         # Call the function to remove strings and invalid entries from specified columns
         df1 = remove_strings_from_columns(df1, columns_to_check)
@@ -290,7 +298,7 @@ def label_csvs(input_folder, time_ranges_df, output_folder="labeled_csv", timezo
 
     # Get a list of all CSV files in the input folder
     csv_files = [f for f in os.listdir(input_folder) if f.endswith(".csv")]
-
+    #print(csv_files)
     # Process CSVs in parallel using ProcessPoolExecutor
     with ProcessPoolExecutor(max_workers=num_workers) as executor:
         futures = []
