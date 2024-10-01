@@ -15,3 +15,45 @@
 
 You can access the dataset [here](#).
 
+## Tool Usage Guide
+
+#### Step 1: Processing PCAP Files
+The process of generating the Unified Multimodal (UM) dataset begins with processing raw PCAP files. The first step involves using the tool to convert PCAP files into CSV format containing payload content, statistical flow features, and contextual window-based features. This can be achieved with the following command:
+
+```python
+from pcap_process.flow_payload import *
+pcap_process(dataset_folder=folder_name, window_size, vulnerable_ports_list, http_ports_list, idle_timeout, active_timeout, flowlimit)
+
+```
+
+Key parameters such as the rolling window size, the list of ports to monitor, and flow termination criteria (based on active timeout, idle timeout, or packet limit) can be customized to suit your specific needs. This allows for flexible dataset generation based on the features most relevant to your analysis.
+
+The tool extracts flow-level features, payload content, and contextual features based on a sliding time window, providing a detailed dataset ready for further processing and labeling in the next steps.
+
+#### Step 2: Preparing Pre-labeled CSVs
+In the second step, the tool requires pre-labeled CSVs. These CSVs must include:
+- Timestamp Column: This can be in Unix format or a timestamp in any timezone, but the timezone must be known to the user.
+- Flow Duration Column: A column indicating the duration of each flow.
+- Source/Destination IP and Ports: Columns containing source and destination IPs and ports for labeling purposes.
+To label the processed CSVs from Step 1, use the following commands:
+
+```python
+from label.parallel_label import *
+# Extract metadata from pre-labeled CSVs
+meta_data = extract_time_ranges_from_csvs(folders, timestamp_column='timestamp', timezone='None', batch_size=5)
+```
+
+#### Step 3: Labeling Processed CSVs
+Finally, use the metadata to label the processed CSVs:
+```python
+label_csvs(input_folder, meta_data, output_folder="labeled_csv", timezone='Canada/Atlantic', num_workers=2, unit='ms', timestamp_col='timestamp', flowduration_col='flowduration', label_col='label')
+```
+
+- input_folder: Directory containing the processed CSV files.
+- meta_data: Extracted metadata for matching and labeling.
+- output_folder: The folder where labeled CSVs will be saved (will be created in the input folder).
+- timezone: Specify the timezone.
+- num_workers: Number of parallel workers for processing.
+This workflow ensures smooth processing and labeling of PCAP files into a unified dataset format, ready for machine learning analysis.
+
+
