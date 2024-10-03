@@ -2,7 +2,8 @@
 
 <meta name="google-site-verification" content="5WK343ADbdgrsx0UqyrJwGNjU5xKzLWjmNP7f502qWo" />
 
-[![DOI](https://zenodo.org/badge/524051176.svg)](https://zenodo.org/badge/latestdoi/524051176)
+[![DOI](https://zenodo.org/badge/524051176.svg)](https://ieee-dataport.org/documents/unified-multimodal-network-intrusion-detection-systems-dataset)
+
 
 <p align="justify"> The Unified, Multimodal NIDS Dataset tool is designed to address the issue of inconsistent feature sets across publicly available network intrusion detection system (NIDS) datasets. Many existing datasets vary significantly in their features, have inconsistent labeling, and often exclude crucial payload and contextual information, limiting the effectiveness of machine learning-based models. </p>
 
@@ -13,7 +14,8 @@
 ## Dataset Coverage
 <p align="justify"> The Unified Multimodal NIDS Dataset includes processed data from four publicly available, well-established network intrusion detection datasets: CIC-IDS 2017, CIC-IoT 2023, UNSW-NB15, and a DDoS-specific dataset. These datasets have been standardized to ensure consistency in feature sets, including flow, payload, and contextual data. Additionally, the tool supports the extension of the dataset by allowing users to process and add new datasets, converting raw PCAP files into the same unified format. This flexibility ensures that the dataset can be expanded further to accommodate evolving research needs. </p>
 
-You can access the dataset [here](#).
+You can access the dataset [here](https://ieee-dataport.org/documents/unified-multimodal-network-intrusion-detection-systems-dataset)
+.
 
 ## Tool Usage Guide
 
