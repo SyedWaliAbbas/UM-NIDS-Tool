@@ -2,7 +2,7 @@
 
 <meta name="google-site-verification" content="5WK343ADbdgrsx0UqyrJwGNjU5xKzLWjmNP7f502qWo" />
 
-[![DOI](https://zenodo.org/badge/524051176.svg)](https://ieee-dataport.org/documents/unified-multimodal-network-intrusion-detection-systems-dataset)
+[<img src="/doi.png" width="100" valign="middle"  />](https://ieee-dataport.org/documents/unified-multimodal-network-intrusion-detection-systems-dataset)
 
 
 <p align="justify"> The Unified, Multimodal NIDS Dataset tool is designed to address the issue of inconsistent feature sets across publicly available network intrusion detection system (NIDS) datasets. Many existing datasets vary significantly in their features, have inconsistent labeling, and often exclude crucial payload and contextual information, limiting the effectiveness of machine learning-based models. </p>
