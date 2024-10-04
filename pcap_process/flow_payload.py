@@ -7,7 +7,6 @@ import time
 
 import nfstream
 from nfstream import NFStreamer, NFPlugin
-import pandas as pd
 import os
 
 
