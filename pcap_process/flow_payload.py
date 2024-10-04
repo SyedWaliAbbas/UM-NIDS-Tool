@@ -2,7 +2,6 @@ import sys
 import os
 import pandas as pd
 from tqdm import tqdm
-import sys
 import time
 
 import nfstream
