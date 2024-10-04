@@ -6,7 +6,6 @@ import time
 
 import nfstream
 from nfstream import NFStreamer, NFPlugin
-import os
 
 
 class DstIpBidirectionalPacketTracker(NFPlugin):
