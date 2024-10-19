@@ -66,3 +66,21 @@ You will also find examples of payload-based NIDS processing in the file [payloa
 
 Moreover, we have trained and tested various classifiers on the undersampled version of the UM-NIDS dataset in [undersampled.ipynb](https://github.com/SyedWaliAbbas/Unified-Network-Intrusion-Dataset/blob/main/Dataset%20Examples/Undersampled%20UM-NIDS.ipynb), showcasing the tool’s flexibility and ease of use in different machine learning scenarios.
 
+
+## Citation 
+ If you are using our tool, kindly cite our [paper](https://ieeexplore.ieee.org/document/10720901) which outlines the details of the graph modeling and processing. 
+
+
+ ```yaml
+@ARTICLE{10720901,
+  author={Wali, Syed and Farrukh, Yasir Ali and Khan, Irfan and Bastian, Nathaniel D.},
+  journal={IEEE Data Descriptions}, 
+  title={Meta: Towards a Unified, Multimodal Dataset for Network Intrusion Detection Systems}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={1-8},
+  keywords={Payloads;Feature extraction;Metadata;Labeling;Pipelines;Machine learning;Data mining;Network intrusion detection;Telecommunication traffic;Analytical models;Network Intrusion Detection Systems;Multimodal Dataset;Machine Learning;Security;Payload},
+  doi={10.1109/IEEEDATA.2024.3482286}
+}
+```
